@@ -1,0 +1,4 @@
+/sample/**/build/
+*.local
+local.properties
+.DS_Store

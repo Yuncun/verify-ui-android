@@ -1,0 +1,11 @@
+# Maestro flow: launch the app, grant first-run permissions, land on the Home
+# screen, and screenshot it. Copy this file per screen — change the navigation
+# steps and the screenshot name. Docs: https://maestro.mobile.dev
+appId: com.example.app
+---
+- launchApp:
+    clearState: true
+    permissions:
+      all: allow
+# - tapOn: "Settings"      # add navigation steps to reach the screen you verify
+- takeScreenshot: home     # writes home.png in the directory maestro runs from

@@ -1,0 +1,19 @@
+# verify-ui config — fill this in for YOUR app, then write one Maestro flow per
+# screen you want guarded. Read by the /verify-ui skill.
+
+# Which emulator to boot if none is connected. Optional: omit to require that you
+# already have an emulator or device running (/verify-ui will not cold-boot one).
+device:
+  avd: Pixel_9
+
+# Command that builds AND installs your app onto the device.
+build: "./gradlew :app:installDemoDebug"
+
+# Your app's installed application id (used to force-stop between runs).
+package: com.example.app
+
+# One entry per screen to verify. `flow` is a Maestro YAML that launches the app,
+# navigates to the screen, and takes a screenshot.
+screens:
+  - name: Home
+    flow: .omakase/verify-ui/home.yaml
