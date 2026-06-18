@@ -1,0 +1,10 @@
+# verify-ui config for Now in Android (demoDebug).
+device:
+  avd: Pixel_9
+build: "./gradlew :app:installDemoDebug"
+package: com.google.samples.apps.nowinandroid.demo.debug
+screens:
+  - name: For You
+    flow: .omakase/verify-ui/foryou.yaml
+  - name: Interests
+    flow: .omakase/verify-ui/interests.yaml
