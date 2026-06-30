@@ -1,7 +1,7 @@
 ---
 name: verify-ui
-description: Best-effort visual verification of Android UI work. Builds + installs the app on a running emulator, drives each configured screen with a Maestro flow, screenshots it, judges PASS/FAIL/ERROR from the rendered pixels against a Material 3 render rubric, prints a one-line-per-screen scorecard, and records its verdict for the pre-push deferred gate. Invoke at done-time on UI work; the agent may self-invoke before claiming completion.
-allowed-tools: Bash(adb *) Bash(maestro *) Bash(./gradlew *) Bash(git *) Bash(sed *) Bash(grep *) Bash(.omakase/bin/omakase-record.sh *) Bash(.omakase/bin/omakase-ledger.sh *) Read
+description: Best-effort visual verification of Android UI work. Builds + installs the app on a running emulator, drives each configured screen with a Maestro flow, screenshots it, judges PASS/FAIL/ERROR from the rendered pixels against a Material 3 render rubric, prints a one-line-per-screen scorecard, and (only when every screen passes) records a pass for the pre-push deferred gate. Invoke at done-time on UI work; the agent may self-invoke before claiming completion.
+allowed-tools: Bash(adb *) Bash(maestro *) Bash(./gradlew *) Bash(git *) Bash(sed *) Bash(grep *) Bash(.omakase/bin/omakase-gate.sh *) Read
 context: fork
 ---
 
@@ -12,17 +12,17 @@ running app like a skeptical user and report what actually renders — not what 
 code "should" do. If you catch yourself reasoning "the code looks fine," stop:
 you are here to look at pixels, not read source.
 
-You drive the UI and judge it; you print a scorecard and **record a verdict** that
-the pre-push deferred gate reads (Step 6). You do not block anything yourself — the
-gate enforces your recorded verdict at push time. The scorecard is for a human to
-skim; the record is what the gate checks.
+You drive the UI and judge it; you print a scorecard and, when it renders, **record a
+pass** that the pre-push deferred gate reads (Step 6). You do not block anything yourself
+— the gate enforces your recorded pass at push time. The scorecard is for a human to
+skim; the recorded pass is what the gate checks.
 
 ## The one rule: never break
 
 The run must survive anything. The emulator missing, the build failing, one
 Maestro flow erroring, a screen never appearing — none of that aborts the run.
 Mark that screen **ERROR** with a one-line reason and move on. **The scorecard
-always prints, the verdict is always recorded (Step 6), and cleanup (Step 7)
+always prints, a pass is recorded only when earned (Step 6), and cleanup (Step 7)
 always runs.** A half-finished run that prints honest rows beats a clean crash
 that prints nothing.
 
@@ -106,18 +106,18 @@ verify-ui — 2 screens
 
 The run verdict is **pass** only if every screen is PASS. Any FAIL → fail. An
 ERROR-only run (nothing could be judged) is fail (the gate must not pass on a run
-that proved nothing). Record it:
+that proved nothing). Record a pass **only** when the run passed — a fail records
+nothing, so the deferred gate stays blocked (the correct outcome):
 
 ```bash
-bash .omakase/bin/omakase-record.sh --check verify-ui --verdict pass   # or fail
+bash .omakase/bin/omakase-gate.sh verify-ui --record   # run this ONLY if every screen PASSed
 ```
 
-To override a judged FAIL (you have a documented reason it is acceptable to push
-anyway), record a waiver — it is surfaced loudly at push time, never silent:
+To push despite a judged FAIL (you have a documented reason), do not fake a pass.
+Bypass the gate for a single push — it prints a loud notice at push time, never silent:
 
 ```bash
-bash .omakase/bin/omakase-record.sh --check verify-ui --verdict pass \
-  --original-verdict fail --reason "Settings blank is a known upstream data stub, tracked in #123"
+OMAKASE_SKIP_VERIFY_UI=1 git push
 ```
 
 ### 7. Cleanup
