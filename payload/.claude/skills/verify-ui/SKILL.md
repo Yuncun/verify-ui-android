@@ -114,7 +114,7 @@ bash .omakase/bin/omakase-gate.sh verify-ui --record   # run this ONLY if every 
 ```
 
 To push despite a judged FAIL (you have a documented reason), do not fake a pass.
-Bypass the gate for a single push — the bypass is audited in the scorecard, never silent:
+Bypass the gate for a single push — it prints a loud notice at push time, never silent:
 
 ```bash
 OMAKASE_SKIP_VERIFY_UI=1 git push
