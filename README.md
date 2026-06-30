@@ -14,8 +14,9 @@ Edit `.omakase/verify-ui.yml` for your app, then write one Maestro flow per scre
     /verify-ui
 
 Builds and installs your app on a running emulator, screenshots each configured
-screen, judges PASS/FAIL from the pixels, and records the verdict. `git push` is
-blocked until a fresh PASS exists for the commit; `--no-verify` is the only bypass.
+screen, judges PASS/FAIL from the pixels, and records a pass when every screen
+renders. `git push` is blocked until a fresh PASS exists for the commit; bypass a
+single push (audited in the scorecard) with `OMAKASE_SKIP_VERIFY_UI=1`.
 
 ## Remove
 
